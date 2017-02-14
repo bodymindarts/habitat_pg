@@ -1,0 +1,40 @@
+version: '2'
+services:
+  postgresql1:
+    container_name: pg1
+    image: bodymindarts/postgresql
+    build: ./postgres
+    ports:
+    - "5432:5432"
+    - "9631:9631"
+    volumes:
+    - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
+    - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
+    environment:
+    - HAB_POSTGRESQL=initdb_superuser_password='admin'
+    command: "/dev/bin/hab-sup start core/postgresql --topology leader --config-from /conf"
+  postgresql2:
+    container_name: pg2
+    image: bodymindarts/postgresql
+    build: ./postgres
+    links:
+    - postgresql1
+    volumes:
+    - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
+    - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
+    environment:
+    - HAB_POSTGRESQL=initdb_superuser_password='admin'
+    command: "/dev/bin/hab-sup start core/postgresql --peer postgresql1 --topology leader --config-from /conf"
+  postgresql3:
+    container_name: pg3
+    image: bodymindarts/postgresql
+    build: ./postgres
+    links:
+    - postgresql1
+    - postgresql2
+    volumes:
+    - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
+    - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
+    environment:
+    - HAB_POSTGRESQL=initdb_superuser_password='admin'
+    command: "/dev/bin/hab-sup start core/postgresql --peer postgresql1 --topology leader --config-from /conf"
