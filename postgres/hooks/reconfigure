@@ -1,11 +1,9 @@
 #!/bin/sh
-#
 
-echo RECONFIGURING {{svc.me.follower}} {{svc.me.leader}}
 {{~#unless svc.me.follower}}
 if [ -f {{pkg.svc_data_path}}/recovery.conf ]; then
-  echo "promoting"
-  until PGPASSWORD={{cfg.initdb_superuser_password}} psql -U {{cfg.initdb_superuser_name}} -h localhost postgres -c 'SELECT 1'; do
+  echo "Promoting database"
+  until PGPASSWORD={{cfg.initdb_superuser_password}} pg_isready -U {{cfg.initdb_superuser_name}} -h localhost; do
     echo "Waiting for database to start"
     sleep 1
   done
