@@ -1,5 +1,9 @@
 version: '2'
 services:
+  reference:
+    image: bodymindarts/postgresql
+    build: ./postgres
+    command: "hab start core/postgresql --group reference"
   postgresql1:
     container_name: pg1
     image: bodymindarts/postgresql
@@ -9,32 +13,31 @@ services:
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
     environment:
     - HAB_POSTGRESQL=initdb_superuser_password='admin'
-    command: "/dev/bin/hab-sup start core/postgresql --topology leader --config-from /conf"
+    command: "/dev/bin/hab-sup start core/postgresql --group hab_pg --peer reference --topology leader --config-from /conf"
   postgresql2:
     container_name: pg2
     image: bodymindarts/postgresql
     build: ./postgres
     links:
-    - postgresql1
+    - reference
     volumes:
     - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
     environment:
     - HAB_POSTGRESQL=initdb_superuser_password='admin'
-    command: "/dev/bin/hab-sup start core/postgresql --peer postgresql1 --topology leader --config-from /conf"
+    command: "/dev/bin/hab-sup start core/postgresql --group hab_pg --peer reference --topology leader --config-from /conf"
   postgresql3:
     container_name: pg3
     image: bodymindarts/postgresql
     build: ./postgres
     links:
-    - postgresql1
-    - postgresql2
+    - reference
     volumes:
     - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
     environment:
     - HAB_POSTGRESQL=initdb_superuser_password='admin'
-    command: "/dev/bin/hab-sup start core/postgresql --peer postgresql1 --topology leader --config-from /conf"
+    command: "/dev/bin/hab-sup start core/postgresql --group hab_pg --peer reference --topology leader --config-from /conf"
   proxy1:
     container_name: proxy1
     image: bodymindarts/haproxy
@@ -43,8 +46,14 @@ services:
     - "5432:5432"
     - "9631:9631"
     links:
-    - postgresql1
+    - reference
     volumes:
     - "~/projects/bodymindarts/habitat_pg/haproxy:/conf"
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
-    command: "/dev/bin/hab-sup start core/haproxy --peer postgresql1 --bind backend:postgresql.default --config-from /conf"
+    command: "/dev/bin/hab-sup start core/haproxy --peer reference --bind backend:postgresql.default --config-from /conf"
+  tests:
+    image: habitat_pg_tests
+    build: ./tests/
+    links:
+    - reference
+    - proxy1

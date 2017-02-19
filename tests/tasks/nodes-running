@@ -1,0 +1,12 @@
+#!/bin/bash
+
+expected=$1
+nodes=$(curl reference:9631/services \
+  | jq '.[].config.svc.all[] | select(.group == "hab_pg").members[] | select(.alive).alive' \
+  | wc -l | tr -d '[:space:]')
+
+if [[ "${nodes}" == "${expected}" ]]; then
+  exit 0
+fi
+
+exit 1
