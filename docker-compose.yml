@@ -4,9 +4,6 @@ services:
     container_name: pg1
     image: bodymindarts/postgresql
     build: ./postgres
-    ports:
-    - "5432:5432"
-    - "9631:9631"
     volumes:
     - "~/projects/bodymindarts/habitat_pg/postgres:/conf"
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
@@ -38,3 +35,16 @@ services:
     environment:
     - HAB_POSTGRESQL=initdb_superuser_password='admin'
     command: "/dev/bin/hab-sup start core/postgresql --peer postgresql1 --topology leader --config-from /conf"
+  proxy1:
+    container_name: proxy1
+    image: bodymindarts/haproxy
+    build: ./haproxy
+    ports:
+    - "5432:5432"
+    - "9631:9631"
+    links:
+    - postgresql1
+    volumes:
+    - "~/projects/bodymindarts/habitat_pg/haproxy:/conf"
+    - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
+    command: "/dev/bin/hab-sup start core/haproxy --peer postgresql1 --bind backend:postgresql.default --config-from /conf"

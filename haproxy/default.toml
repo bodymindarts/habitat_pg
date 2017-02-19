@@ -1,0 +1,22 @@
+maxconn = 32
+mode = "tcp"
+bind = "*:5432"
+httpchk = false
+
+status_page = false
+status_bind = "*:9000"
+status_user = "admin"
+status_password = "password"
+status_uri = "/haproxy-stats"
+
+bind_leader = "true"
+
+[[server]]
+name = "first"
+host_or_ip = "172.17.0.3"
+port = "8000"
+
+[[server]]
+name = "second"
+host_or_ip = "172.17.0.4"
+port = "8000"
