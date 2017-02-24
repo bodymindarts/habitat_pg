@@ -15,8 +15,7 @@ if [[ ! -f "{{pkg.svc_data_path}}/PG_VERSION" ]]; then
          -E {{cfg.initdb_encoding}} \
          -D {{pkg.svc_data_path}} \
          --pwfile {{cfg.initdb_pwfile}} \
-         --no-locale && \
-  rm {{pkg.svc_config_path}}/pwfile
+         --no-locale
 fi
 {{~/unless}}
 {{#if svc.me.follower ~}}
