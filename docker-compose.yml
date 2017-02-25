@@ -1,9 +1,12 @@
 version: '2'
 services:
   reference:
-    image: bodymindarts/postgresql
-    build: ./postgres
-    command: "hab start bodymindarts/postgresql --group reference"
+    container_name: ref
+    image: reference
+    build: ./reference
+    volumes:
+    - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
+    command: "/dev/bin/hab-sup start core/postgresql --group reference"
   postgresql1:
     container_name: pg1
     image: bodymindarts/postgresql
