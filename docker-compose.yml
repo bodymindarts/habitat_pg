@@ -57,7 +57,7 @@ services:
     volumes:
     - "~/projects/bodymindarts/habitat_pg/haproxy:/conf"
     - "~/projects/habitat-sh/habitat/target/debug:/dev/bin"
-    command: "/dev/bin/hab-sup start core/haproxy --peer reference --bind backend:postgresql.default --config-from /conf"
+    command: "/dev/bin/hab-sup start core/haproxy --peer reference --bind backend:postgresql.hab_pg --config-from /conf"
   tests:
     image: habitat_pg_tests
     build: ./tests/
