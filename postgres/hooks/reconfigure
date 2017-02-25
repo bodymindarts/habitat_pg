@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{{~#unless svc.me.follower}}
+{{#unless svc.me.follower ~}}
 if [ -f {{pkg.svc_data_path}}/recovery.conf ]; then
   echo "Promoting database"
   until PGPASSWORD={{cfg.initdb_superuser_password}} pg_isready -U {{cfg.initdb_superuser_name}} -h localhost; do
@@ -11,4 +11,3 @@ if [ -f {{pkg.svc_data_path}}/recovery.conf ]; then
   pg_ctl promote -D {{pkg.svc_data_path}}
 fi
 {{~/unless}}
-
